@@ -1,25 +1,38 @@
 package com.example.newsapp.ui
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.newsapp.ui.components.DetailScreen
 import com.example.newsapp.ui.components.TopNews
 
 @Composable
-fun NewsApp(){
+fun NewsApp() {
 
-   Navigation()
+    Navigation()
 
 }
 
 @Composable
-fun Navigation(){
+fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "topNews"){
+    NavHost(navController = navController, startDestination = "topNews") {
         composable("topNews") { TopNews(navController) }
-        composable("details") {  DetailScreen(navController)}
+        composable(
+            "details/{newsId}",
+            arguments = listOf(
+                navArgument("newsId") { type = NavType.IntType}
+            )
+        ) {
+           navBackStackEntry ->
+           val id =  navBackStackEntry.arguments!!.getInt("newsId")
+            val newsData = MockData.getNewsData(newsId = id)
+
+            DetailScreen(navController,newsData)
+        }
     }
 }

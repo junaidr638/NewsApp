@@ -1,5 +1,6 @@
 package com.example.newsapp.ui
 
+import androidx.compose.runtime.Composable
 import com.example.newsapp.R
 
 object MockData {
@@ -68,4 +69,11 @@ object MockData {
             "13-02-2023 04:33"
         )
     )
+
+    @Composable
+    fun getNewsData(newsId:Int):NewsData {
+        return topNewsList.first{ it.id == newsId }
+    }
+
 }
+

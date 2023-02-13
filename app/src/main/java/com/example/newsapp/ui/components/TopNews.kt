@@ -1,6 +1,7 @@
 package com.example.newsapp.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,7 +29,11 @@ fun TopNews(navController: NavController) {
         Text(text = "Top News", fontWeight = FontWeight.SemiBold)
         LazyColumn {
             items(MockData.topNewsList) { newsItem ->
-                NewsItemUI(newsData = newsItem)
+                NewsItemUI(
+                    newsData = newsItem,
+                    onNewsClick = {
+                        navController.navigate("details/${newsItem.id}")
+                    })
             }
         }
     }
@@ -37,24 +42,32 @@ fun TopNews(navController: NavController) {
 
 
 @Composable
-fun NewsItemUI(newsData: NewsData) {
+fun NewsItemUI(newsData: NewsData, onNewsClick: () -> Unit = {}) {
     Box(
         modifier = Modifier
-            .height(200.dp)
+            .height(230.dp)
+            .fillMaxWidth()
             .padding(8.dp)
+            .clickable {
+                onNewsClick()
+            }
     ) {
         Image(
             painter = painterResource(id = newsData.image),
             contentDescription = "News Image",
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
         )
-        Column(modifier = Modifier.padding(16.dp)
-            .wrapContentHeight(),
-            verticalArrangement = Arrangement.SpaceBetween) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .wrapContentHeight(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
 
             Text(text = newsData.publishedAt, color = Color.White)
             Text(text = newsData.author, color = Color.White, fontStyle = FontStyle.Italic)
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(35.dp))
             Text(text = newsData.title, fontWeight = FontWeight.ExtraBold, color = Color.White)
             Text(text = newsData.description, fontWeight = FontWeight.SemiBold, color = Color.White)
         }
