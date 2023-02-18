@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.ui.MockData
+import com.example.newsapp.ui.MockData.timeAgo
 import com.example.newsapp.ui.NewsData
 
 @Composable
@@ -65,7 +66,7 @@ fun NewsItemUI(newsData: NewsData, onNewsClick: () -> Unit = {}) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Text(text = newsData.publishedAt, color = Color.White)
+            Text(text = MockData.stringToDate(newsData.publishedAt).timeAgo() , color = Color.White)
             Text(text = newsData.author, color = Color.White, fontStyle = FontStyle.Italic)
             Spacer(modifier = Modifier.height(35.dp))
             Text(text = newsData.title, fontWeight = FontWeight.ExtraBold, color = Color.White)
