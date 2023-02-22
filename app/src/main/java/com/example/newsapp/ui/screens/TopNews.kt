@@ -22,18 +22,20 @@ import androidx.navigation.compose.rememberNavController
 import com.example.newsapp.ui.MockData
 import com.example.newsapp.ui.MockData.timeAgo
 import com.example.newsapp.ui.NewsData
+import com.example.newsapp.ui.models.TopNewsArticles
+import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
-fun TopNews(navController: NavController) {
+fun TopNews(navController: NavController, articles: List<TopNewsArticles>) {
 
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "Top News", fontWeight = FontWeight.SemiBold)
         LazyColumn {
-            items(MockData.topNewsList) { newsItem ->
+            items(articles.size) { index ->
                 NewsItemUI(
-                    newsData = newsItem,
+                    article = articles[index],
                     onNewsClick = {
-                        navController.navigate("details/${newsItem.id}")
+                        navController.navigate("details/$index")
                     })
             }
         }
@@ -43,7 +45,7 @@ fun TopNews(navController: NavController) {
 
 
 @Composable
-fun NewsItemUI(newsData: NewsData, onNewsClick: () -> Unit = {}) {
+fun NewsItemUI(article: TopNewsArticles, onNewsClick: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .height(230.dp)
@@ -53,12 +55,14 @@ fun NewsItemUI(newsData: NewsData, onNewsClick: () -> Unit = {}) {
                 onNewsClick()
             }
     ) {
-        Image(
-            painter = painterResource(id = newsData.image),
-            contentDescription = "News Image",
+
+        CoilImage(
+            imageModel = article.urlToImage,
             contentScale = ContentScale.FillBounds,
+            contentDescription = article.description,
             modifier = Modifier.fillMaxSize()
         )
+
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -66,11 +70,11 @@ fun NewsItemUI(newsData: NewsData, onNewsClick: () -> Unit = {}) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            Text(text = MockData.stringToDate(newsData.publishedAt).timeAgo() , color = Color.White)
-            Text(text = newsData.author, color = Color.White, fontStyle = FontStyle.Italic)
+            Text(text = MockData.stringToDate(article.publishedAt!!).timeAgo(), color = Color.White)
+            Text(text = article.author ?: "Anonymous", color = Color.White, fontStyle = FontStyle.Italic)
             Spacer(modifier = Modifier.height(35.dp))
-            Text(text = newsData.title, fontWeight = FontWeight.ExtraBold, color = Color.White)
-            Text(text = newsData.description, fontWeight = FontWeight.SemiBold, color = Color.White)
+            Text(text = article.title ?: "No info", fontWeight = FontWeight.ExtraBold, color = Color.White)
+            Text(text = article.description ?: "No info", fontWeight = FontWeight.SemiBold, color = Color.White)
         }
     }
 
@@ -80,13 +84,6 @@ fun NewsItemUI(newsData: NewsData, onNewsClick: () -> Unit = {}) {
 @Composable
 fun TopNewsPreview() {
     NewsItemUI(
-        NewsData(
-            7,
-            com.example.newsapp.R.drawable.breaking_news,
-            "Anonymous",
-            "Turkey hit by earhtquakes: 7.8 magnitude ",
-            "Centre had earlier told court that the delimitation process can't wait in Jammu and Kashmir until 2026. ",
-            "13-02-2023 04:33"
-        )
+       article = TopNewsArticles()
     )
 }

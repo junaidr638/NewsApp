@@ -1,11 +1,10 @@
 package com.example.newsapp.network
 
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import com.example.newsapp.ui.models.ArticleCategory
 import com.example.newsapp.ui.models.TopNewsResponse
+import com.example.newsapp.ui.models.getSpecificCategory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,6 +16,8 @@ class NewsManager {
             _newsResponse
         }
 
+    val selectedCategory:MutableState<ArticleCategory?> = mutableStateOf(null)
+
     init {
         getArticles()
     }
@@ -24,7 +25,7 @@ class NewsManager {
 
     private fun getArticles(){
 
-        val service = Api.retrofitService.getTopArticles("us",Api.API_KEY)
+        val service = Api.retrofitService.getTopArticles("in",Api.API_KEY)
         service.enqueue(object : Callback<TopNewsResponse> {
             override fun onResponse(
                 call: Call<TopNewsResponse>,
@@ -32,7 +33,7 @@ class NewsManager {
             ) {
                 if (response.isSuccessful){
                     _newsResponse.value = response.body()!!
-                    Log.d("NEWS","${_newsResponse.value}")
+                    Log.d("NEWS","${response.body()}")
                 }else {
                     Log.d("NEWS ERROR","${response.errorBody()}")
                 }
@@ -43,5 +44,11 @@ class NewsManager {
             }
 
         })
+    }
+
+
+    fun onSelectedCategoryChanged(category:String){
+        val newCategory = getSpecificCategory(category)
+        selectedCategory.value = newCategory
     }
 }

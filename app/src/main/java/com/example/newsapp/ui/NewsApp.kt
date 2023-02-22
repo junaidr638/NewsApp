@@ -13,6 +13,7 @@ import com.example.newsapp.network.NewsManager
 import com.example.newsapp.ui.components.BottomMenu
 import com.example.newsapp.ui.components.DetailScreen
 import com.example.newsapp.ui.components.TopNews
+import com.example.newsapp.ui.models.TopNewsArticles
 import com.example.newsapp.ui.screens.Categories
 import com.example.newsapp.ui.screens.Sources
 
@@ -32,20 +33,27 @@ fun MainScreen(navController: NavHostController, scrollState: ScrollState) {
     }) {
         it
         Navigation(navController, scrollState)
-
-
     }
 }
 
 
-fun NavGraphBuilder.bottomNavigation(navController: NavHostController) {
+fun NavGraphBuilder.bottomNavigation(
+    navController: NavHostController,
+    articles: List<TopNewsArticles>,
+    newsManager: NewsManager
+) {
     composable(BottomMenuScreen.TopNews.route) {
-        TopNews(navController = navController)
+        TopNews(navController = navController, articles = articles)
     }
 
     composable(BottomMenuScreen.Categories.route) {
-        Categories()
+        Categories(newsManager = newsManager,
+            onFetchCategory = {
+                newsManager.onSelectedCategoryChanged(category = it)
+            }
+        )
     }
+
 
     composable(BottomMenuScreen.Sources.route) {
         Sources()
@@ -53,23 +61,33 @@ fun NavGraphBuilder.bottomNavigation(navController: NavHostController) {
 }
 
 @Composable
-fun Navigation(navController: NavHostController, scrollState: ScrollState,newsManager: NewsManager = NewsManager()) {
+fun Navigation(
+    navController: NavHostController,
+    scrollState: ScrollState,
+    newsManager: NewsManager = NewsManager()
+) {
 
     val articles = newsManager.newsResponse.value.articles
     Log.d("TOP NEWS", "$articles")
-    NavHost(navController = navController, startDestination = "topNews") {
+    articles?.let {
+        NavHost(navController = navController, startDestination = "topNews") {
 
-        bottomNavigation(navController)
-        composable("topNews") { TopNews(navController) }
-        composable(
-            "details/{newsId}", arguments = listOf(navArgument("newsId") {
-                type = NavType.IntType
-            })
-        ) { navBackStackEntry ->
-            val id = navBackStackEntry.arguments!!.getInt("newsId")
-            val newsData = MockData.getNewsData(newsId = id)
+            bottomNavigation(navController, articles, newsManager)
+            composable("topNews") {
+                TopNews(navController, articles)
+            }
+            composable(
+                "details/{index}", arguments = listOf(navArgument("index") {
+                    type = NavType.IntType
+                })
+            ) { navBackStackEntry ->
+                val index = navBackStackEntry.arguments?.getInt("index")
+                index?.let {
+                    DetailScreen(articles[index], scrollState, navController)
+                }
 
-            DetailScreen(newsData, scrollState, navController)
+            }
         }
     }
+
 }

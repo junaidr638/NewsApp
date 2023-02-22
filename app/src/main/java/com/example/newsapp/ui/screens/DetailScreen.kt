@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +27,11 @@ import com.example.newsapp.ui.MockData
 import com.example.newsapp.ui.MockData.stringToDate
 import com.example.newsapp.ui.MockData.timeAgo
 import com.example.newsapp.ui.NewsData
+import com.example.newsapp.ui.models.TopNewsArticles
+import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
-fun DetailScreen(newsData: NewsData, scrollState: ScrollState, navController: NavController) {
+fun DetailScreen(article:TopNewsArticles , scrollState: ScrollState, navController: NavController) {
     Scaffold(topBar = {
 
         TopAppBarDetail {
@@ -45,17 +48,19 @@ fun DetailScreen(newsData: NewsData, scrollState: ScrollState, navController: Na
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Detail Screen", fontWeight = FontWeight.SemiBold)
-            Image(
-                painter = painterResource(id = newsData.image),
-                contentDescription = ("Cover Image")
+            CoilImage(
+                imageModel = article.urlToImage,
+                contentScale = ContentScale.FillBounds,
+                contentDescription = article.description,
+                modifier = Modifier.fillMaxSize()
             )
             Row {
-                IconWithInfo(icon = Icons.Outlined.Edit, newsData.author)
+                IconWithInfo(icon = Icons.Outlined.Edit, article.author!!)
                 Spacer(modifier = Modifier.width(30.dp))
-                IconWithInfo(icon = Icons.Outlined.DateRange, info = stringToDate(newsData.publishedAt).timeAgo())
+                IconWithInfo(icon = Icons.Outlined.DateRange, info = stringToDate(article.publishedAt!!).timeAgo())
             }
 
-            Text(text = newsData.description)
+            Text(text = article.description!!)
 
         }
     }
@@ -92,13 +97,6 @@ fun IconWithInfo(icon: ImageVector, info: String) {
 @Composable
 fun DetailScreenPreview() {
     DetailScreen(
-        NewsData(
-            6,
-            R.drawable.eggs,
-            "Free Press Kashmir",
-            " Prices of eggs skyrocket in Kashmir ",
-            "Centre had earlier told court that the delimitation process can't wait in Jammu and Kashmir until 2026. ",
-            "13-02-2023 04:33"
-        ), rememberScrollState(), rememberNavController()
+       TopNewsArticles(), rememberScrollState(), rememberNavController()
     )
 }
