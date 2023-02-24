@@ -55,7 +55,7 @@ fun DetailScreen(article:TopNewsArticles , scrollState: ScrollState, navControll
                 modifier = Modifier.fillMaxSize()
             )
             Row {
-                IconWithInfo(icon = Icons.Outlined.Edit, article.author!!)
+                IconWithInfo(icon = Icons.Outlined.Edit, article.author)
                 Spacer(modifier = Modifier.width(30.dp))
                 IconWithInfo(icon = Icons.Outlined.DateRange, info = stringToDate(article.publishedAt!!).timeAgo())
             }
@@ -85,10 +85,10 @@ fun TopAppBarDetail(onBackPressed: () -> Unit) {
 }
 
 @Composable
-fun IconWithInfo(icon: ImageVector, info: String) {
+fun IconWithInfo(icon: ImageVector, info: String?) {
     Row {
         Icon(icon, "meta data", tint = Color.Green)
-        Text(text = info, fontWeight = FontWeight.Bold)
+        Text(text = info ?: "N/A" , fontWeight = FontWeight.Bold)
     }
 
 }
